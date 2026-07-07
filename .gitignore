@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Dataset (do not commit)
 Mouse-Dynamics-Challenge/
 Balabit*/
@@ -36,7 +35,7 @@ sapiagent/
 
 # agent operating spec (local only)
 CLAUDE.md
-=======
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -255,4 +254,3 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
->>>>>>> 06583b072ab1214545f8b843d50aa0acc42ed110
