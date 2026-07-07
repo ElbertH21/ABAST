@@ -8,6 +8,7 @@ Balabit*/
 !realism_metrics.csv
 !realism_per_session.csv
 !step7_oob_summary.csv
+!attack_results_all_tiers.csv
 # Environments
 *.venv/
 sapiagent-venv/
