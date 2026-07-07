@@ -1,0 +1,37 @@
+# Dataset (do not commit)
+Mouse-Dynamics-Challenge/
+Balabit*/
+# CSVs excluded by default, whitelist the small result tables
+*.csv
+!fair_results_week6.csv
+!robustness_week6.csv
+!realism_metrics.csv
+!realism_per_session.csv
+!step7_oob_summary.csv
+# Environments
+*.venv/
+sapiagent-venv/
+venv/
+.venv/
+# Large binary artifacts / models
+*.npy
+*.h5
+*.keras
+*.pkl
+# Python / Jupyter cruft
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+
+# local scratch working dir (code lives in attacker/, results in results/)
+a2/
+
+# cloned third-party repos (their own .git; code we use is copied into attacker/)
+sapiagent/
+
+# agent local config
+.claude/
+
+# agent operating spec (local only)
+CLAUDE.md
