@@ -11,7 +11,11 @@ sys.path.insert(0, os.path.dirname(__file__))
 from balabit_actions import list_training_sessions
 from sapiagent_emitter import make_empirical_dt_sampler   # reuse verbatim (same timing)
 
-ART = os.path.join(os.path.dirname(__file__), "artifacts")
+_REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SRC_ART = os.path.join(_REPO, "a2", "artifacts")                    # SapiAgent pkls (scratch)
+DMTG_DIR = os.path.join(_REPO, "a2", "handoff", "dmtg_sessions")     # A3 saved sessions
+ART = os.path.join(_REPO, "results")                                 # tracked deliverables (outputs)
+os.makedirs(ART, exist_ok=True)
 SCREEN = (1920, 1080); W, H = SCREEN
 SEEDS = [0, 1, 2]; N_SESSIONS = 20; N_SEGMENTS = 12
 
@@ -140,10 +144,17 @@ sources["windmouse"] = wm
 # 3. sapiagent: existing 60 sessions
 sa = []
 for seed in SEEDS:
-    lst = pickle.load(open(os.path.join(ART, f"sapiagent_sessions_seed{seed}.pkl"), "rb"))
+    lst = pickle.load(open(os.path.join(SRC_ART, f"sapiagent_sessions_seed{seed}.pkl"), "rb"))
     for sid, df in enumerate(lst):
         sa.append((f"seed{seed}_s{sid}", df))
 sources["sapiagent"] = sa
+# 4. dmtg (A3): 60 saved 3-col Balabit CSVs — SAME extract_features, same basis
+dm = []
+for seed in SEEDS:
+    for sid in range(N_SESSIONS):
+        df = pd.read_csv(os.path.join(DMTG_DIR, f"seed{seed}", f"session_{sid:02d}.csv"))
+        dm.append((f"seed{seed}_s{sid}", df))
+sources["dmtg"] = dm
 print({k: len(v) for k, v in sources.items()})
 
 # ---- metrics -------------------------------------------------------------
@@ -158,8 +169,9 @@ for src, lst in sources.items():
 per_session = pd.DataFrame(per_session_rows)
 per_session.to_csv(os.path.join(ART, "realism_per_session.csv"), index=False)
 
+SOURCES4 = ["genuine", "windmouse", "sapiagent", "dmtg"]
 agg_rows = []
-for src in ["genuine", "windmouse", "sapiagent"]:
+for src in SOURCES4:
     sub = per_session[per_session["source"] == src]
     row = {"source": src, "n_sessions": len(sub)}
     for m in METRICS:
@@ -169,12 +181,52 @@ for src in ["genuine", "windmouse", "sapiagent"]:
 agg = pd.DataFrame(agg_rows)
 agg.to_csv(os.path.join(ART, "realism_metrics.csv"), index=False)
 
-pd.set_option("display.width", 200, "display.max_columns", 30)
+# ---- displacement-filtered curvature ------------------------------------
+# The raw curvature (extract_features) divides Δangle by dist_safe (0 -> 1e-6), so
+# near-stationary steps inflate it and make SapiAgent look human. Restricting to
+# steps with dist >= 2px is the honest version. Curvature comes VERBATIM from
+# extract_features; only the step-distance mask is computed here (same dx/dy/hypot
+# extract_features itself uses), purely to filter — no new metric, no reimplementation.
+def _curv_and_dist(df):
+    f = extract_features(df)                                  # verbatim: clipped |curvature|
+    d = df.copy().reset_index(drop=True)
+    dx = d["x"].diff().fillna(0); dy = d["y"].diff().fillna(0)
+    dist = np.sqrt(dx**2 + dy**2).to_numpy()                  # identical to extract_features' dist
+    return f["curvature"].abs().to_numpy(), dist
+
+curv_rows = []
+persess_filt = {s: [] for s in SOURCES4}     # per-session filtered mean -> table ± std
+for src in SOURCES4:
+    cabs_parts, dist_parts = [], []
+    for sid, df in sources[src]:
+        cabs, dist = _curv_and_dist(df)
+        cabs_parts.append(cabs); dist_parts.append(dist)
+        keep_s = dist >= 2.0
+        persess_filt[src].append(float(cabs[keep_s].mean()) if keep_s.any() else np.nan)
+    cabs_all = np.concatenate(cabs_parts); dist_all = np.concatenate(dist_parts)
+    keep = dist_all >= 2.0
+    curv_rows.append({"source": src,
+                      "curvature_raw": float(cabs_all.mean()),
+                      "curvature_dist_ge_2px": float(cabs_all[keep].mean()),
+                      "n_steps_total": int(cabs_all.size),
+                      "n_steps_kept": int(keep.sum())})
+curv_df = pd.DataFrame(curv_rows)
+curv_df.to_csv(os.path.join(ART, "realism_curvature_filtered.csv"), index=False)
+
+pd.set_option("display.width", 240, "display.max_columns", 30)
 print("\n=== realism_metrics (mean +/- std across sessions) ===")
 show = agg.set_index("source")
 for m in METRICS:
     show[m] = show[f"{m}_mean"].map(lambda v: f"{v:.3g}") + " ± " + show[f"{m}_std"].map(lambda v: f"{v:.2g}")
-print(show[["n_sessions"] + METRICS].to_string())
+# filtered-curvature column (per-session mean ± std), inserted next to raw curvature
+for src in show.index:
+    vals = np.array(persess_filt[src], dtype=float); vals = vals[~np.isnan(vals)]
+    show.loc[src, "curvature_filt"] = f"{vals.mean():.3g} ± {vals.std():.2g}"
+cols = ["n_sessions", "velocity_mean", "pause_rate", "curvature_mean",
+        "curvature_filt", "angle_var", "jerk_mean"]
+print(show[cols].to_string())
+print("\n=== realism_curvature_filtered.csv (pooled steps per source) ===")
+print(curv_df.to_string(index=False))
 
 # ---- WindMouse OOB freebie (closes step-7 deferral) ---------------------
 def oob_frac(df):
@@ -186,13 +238,13 @@ print(f"\n=== OOB fraction ===\n  windmouse: mean={wm_oob.mean()*100:.3f}%  max=
 print(f"  sapiagent: mean={sa_oob.mean()*100:.3f}%  max={sa_oob.max()*100:.3f}%")
 
 # ---- distribution figure ------------------------------------------------
-COL = {"genuine": "#009E73", "windmouse": "#E69F00", "sapiagent": "#0072B2"}
+COL = {"genuine": "#009E73", "windmouse": "#E69F00", "sapiagent": "#0072B2", "dmtg": "#CC79A7"}
 plt.rcParams.update({"font.size": 15, "axes.titlesize": 17, "axes.labelsize": 14, "legend.fontsize": 14})
 fig, axes = plt.subplots(2, 3, figsize=(19, 11))
 ax = axes.ravel()
 
 # panel 0: velocity from pooled per-EVENT speeds (log-y density)
-for src in ["genuine", "windmouse", "sapiagent"]:
+for src in SOURCES4:
     v = np.concatenate(event_vel[src])
     ax[0].hist(v, bins=np.linspace(0, 2000, 60), density=True, histtype="step",
                lw=2.4, color=COL[src], label=src)
@@ -214,7 +266,7 @@ for i, (metric, title, logx) in enumerate(panel_cfg, start=1):
         ax[i].set_xscale("log")
     else:
         bins = np.linspace(allv.min(), allv.max(), 30)
-    for src in ["genuine", "windmouse", "sapiagent"]:
+    for src in SOURCES4:
         ax[i].hist(vals[src], bins=bins, density=True, histtype="stepfilled",
                    alpha=0.45, color=COL[src], label=src)
     if logx:  # clean decade ticks only — kill colliding minor-tick labels
@@ -226,22 +278,27 @@ for i, (metric, title, logx) in enumerate(panel_cfg, start=1):
 handles, labels = ax[0].get_legend_handles_labels()
 ax[5].axis("off"); ax[5].legend(handles, labels, loc="center", fontsize=20, title="source",
                                 title_fontsize=20, frameon=True)
-fig.suptitle("Trajectory realism: genuine vs WindMouse vs SapiAgent (defender extract_features)",
+fig.suptitle("Trajectory realism: genuine vs WindMouse vs SapiAgent vs DMTG (defender extract_features)",
              fontsize=20, y=0.995)
 fig.tight_layout()
 fig.savefig(os.path.join(ART, "realism_distributions.png"), dpi=200)
 print(f"\nSaved -> realism_metrics.csv, realism_per_session.csv, realism_distributions.png")
 
 # ---- RESULTS.md entry ----------------------------------------------------
-g = show.loc["genuine"]; wmr = show.loc["windmouse"]; sar = show.loc["sapiagent"]
-finding = (f"Genuine/WindMouse/SapiAgent pause-rate = {g['pause_rate']} / {wmr['pause_rate']} / "
-           f"{sar['pause_rate']}: the two synthetic attackers share the empirical dt sampler so their "
-           f"pause rates match each other and sit far above genuine, confirming acceptance is a "
-           f"timing/threshold-gap effect, not mimicry — while curvature/jerk/velocity separate the "
-           f"three by geometry; WindMouse OOB {wm_oob.mean()*100:.2f}% vs SapiAgent {sa_oob.mean()*100:.2f}% "
-           f"rules out a clipping confound.")
-line = ("\n## Step 8 — realism comparison\n"
+g = show.loc["genuine"]; wmr = show.loc["windmouse"]; sar = show.loc["sapiagent"]; dmr = show.loc["dmtg"]
+cf = curv_df.set_index("source")["curvature_dist_ge_2px"]
+finding = (f"Four-source, one extract_features. Pause-rate genuine/WM/SA/DMTG = {g['pause_rate']} / "
+           f"{wmr['pause_rate']} / {sar['pause_rate']} / {dmr['pause_rate']}: all three synthetics share the "
+           f"empirical dt sampler so their pause rates match and sit far above genuine — acceptance is a "
+           f"timing/threshold-gap effect, not mimicry. Geometry separates them: velocity genuine/WM/SA/DMTG = "
+           f"{g['velocity_mean']} / {wmr['velocity_mean']} / {sar['velocity_mean']} / {dmr['velocity_mean']}. "
+           f"Displacement-filtered curvature (dist>=2px) genuine/WM/SA/DMTG = {cf['genuine']:.3g} / "
+           f"{cf['windmouse']:.3g} / {cf['sapiagent']:.3g} / {cf['dmtg']:.3g}: the raw curvature makes SapiAgent "
+           f"look human, but filtering the near-stationary steps shows SapiAgent ~{cf['sapiagent']/cf['genuine']:.1f}x "
+           f"genuine while DMTG stays close — correcting the 'SapiAgent matches human curvature' claim.")
+line = ("\n## Step 8 — realism comparison (4-source: +DMTG/A3)\n"
         f"- [realism_metrics.csv](realism_metrics.csv), [realism_per_session.csv](realism_per_session.csv), "
+        f"[realism_curvature_filtered.csv](realism_curvature_filtered.csv), "
         f"[realism_distributions.png](realism_distributions.png)\n"
         f"- Finding: {finding}\n")
 with open(os.path.join(ART, "RESULTS.md"), "a") as f:

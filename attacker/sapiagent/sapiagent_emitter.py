@@ -57,6 +57,26 @@ def _rotate_toward(action, cur, dest, min_disp=5.0):
     return action @ R.T
 
 
+def segment_timing(pts, t, rng, dt_sampler=None, fixed_dt=0.010, jitter=0.25,
+                   pause_range=(0.05, 0.6)):
+    """Per-segment timing synthesis + inter-segment pause. SHARED (by import) across
+    A2 (SapiAgent) and A3 (DMTG) so the per-step dt draw and the inter-segment pause
+    stay byte-identical: same empirical dt_sampler, same clip, same cumulative-time
+    formula, same rng.uniform pause. Given a segment path `pts` (n,2) and the current
+    session clock `t`, returns (seg_t, next_t): seg_t is the per-point timestamp array
+    for this segment; next_t is the clock after the pause. RNG use order is preserved
+    exactly (dt_sampler draw, then rng.uniform for the pause)."""
+    n = len(pts)
+    if dt_sampler is not None:
+        dts = np.asarray(dt_sampler(max(n - 1, 1)), dtype=float)[: n - 1]
+    else:
+        dts = fixed_dt * (1.0 + jitter * (2 * rng.random(n - 1) - 1))
+    dts = np.clip(dts, 1e-4, None)
+    seg_t = t + np.concatenate([[0.0], np.cumsum(dts)]) if n > 1 else np.array([t])
+    next_t = seg_t[-1] + rng.uniform(*pause_range)        # inter-segment pause
+    return seg_t, next_t
+
+
 def generate_sapiagent_session(session_id, target_user, rng, action_popper,
                                n_segments=12, screen=(1920, 1080),
                                dt_sampler=None, fixed_dt=0.010, jitter=0.25,
@@ -85,17 +105,10 @@ def generate_sapiagent_session(session_id, target_user, rng, action_popper,
                 break
         pts = cur + np.cumsum(seg, axis=0)               # (128, 2) segment path
         # -------------------------------------------------------------------
-        n = len(pts)
-        if dt_sampler is not None:
-            dts = np.asarray(dt_sampler(max(n - 1, 1)), dtype=float)[: n - 1]
-        else:
-            dts = fixed_dt * (1.0 + jitter * (2 * rng.random(n - 1) - 1))
-        dts = np.clip(dts, 1e-4, None)
-        seg_t = t + np.concatenate([[0.0], np.cumsum(dts)]) if n > 1 else np.array([t])
+        seg_t, t = segment_timing(pts, t, rng, dt_sampler, fixed_dt, jitter, pause_range)
         xs.extend(np.round(pts[:, 0]).astype(int))
         ys.extend(np.round(pts[:, 1]).astype(int))
         ts.extend(seg_t)
-        t = seg_t[-1] + rng.uniform(*pause_range)        # inter-segment pause
         cur = pts[-1]                                    # continuous advance to the in-bounds endpoint (never clamped)
     return pd.DataFrame({
         "record timestamp": np.asarray(ts, dtype=float),

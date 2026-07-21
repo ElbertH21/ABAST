@@ -1,0 +1,113 @@
+{
+  "corpus_size": {
+    "n_actions": 17505,
+    "n_actions_raw": 17579,
+    "n_dropped_artifact": 74,
+    "drop_pct": 0.4209568234825644,
+    "n_sessions": 65,
+    "n_users": 10,
+    "window": 128,
+    "shape": [
+      17505,
+      128,
+      2
+    ]
+  },
+  "per_user": {
+    "per_user_sorted": [
+      [
+        "user7",
+        3321
+      ],
+      [
+        "user9",
+        3233
+      ],
+      [
+        "user20",
+        2284
+      ],
+      [
+        "user12",
+        1920
+      ],
+      [
+        "user16",
+        1873
+      ],
+      [
+        "user15",
+        1169
+      ],
+      [
+        "user29",
+        996
+      ],
+      [
+        "user21",
+        971
+      ],
+      [
+        "user23",
+        969
+      ],
+      [
+        "user35",
+        769
+      ]
+    ],
+    "min": 769,
+    "max": 3321,
+    "median": 1521.0,
+    "mean": 1750.5
+  },
+  "delta_magnitude": {
+    "abs_dx": {
+      "p50": 2.0,
+      "p90": 41.0,
+      "p99": 443.0,
+      "p99_9": 1009.0,
+      "max": 1919.0
+    },
+    "abs_dy": {
+      "p50": 2.0,
+      "p90": 31.0,
+      "p99": 475.0,
+      "p99_9": 815.3610000000335,
+      "max": 1079.0
+    },
+    "n_deltas": 2240640
+  },
+  "net_displacement": {
+    "abs_Dx": {
+      "p50": 170.0,
+      "p90": 607.6000000000004,
+      "p99": 1263.7999999999956,
+      "p99_9": 1700.4960000000028,
+      "max": 1900.0
+    },
+    "abs_Dy": {
+      "p50": 151.0,
+      "p90": 471.0,
+      "p99": 803.0,
+      "p99_9": 990.4800000000141,
+      "max": 1072.0
+    },
+    "norm": {
+      "p50": 291.6727600097656,
+      "p90": 750.2437866210938,
+      "p99": 1340.727031249995,
+      "p99_9": 1826.9854746093786,
+      "max": 2003.6080322265625
+    },
+    "near_zero_px_threshold": 5.0,
+    "n_near_zero": 273,
+    "near_zero_pct": 1.55955441302485
+  },
+  "equidistant_sanity": {
+    "claim": "build_equidistant_inputs(actions).sum(1) == actions.sum(1) exactly",
+    "holds_exactly": true,
+    "max_discrepancy": 0.0,
+    "n_actions_mismatch": 0
+  }
+}

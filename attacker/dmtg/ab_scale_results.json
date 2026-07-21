@@ -1,0 +1,167 @@
+{
+  "seed": 0,
+  "steps": 2000,
+  "batch": 256,
+  "lr": 0.001,
+  "train_std": 0.31788745522499084,
+  "n_train": 15471,
+  "n_val": 1761,
+  "val_sessions": [
+    "user12/session_9838420452",
+    "user16/session_6961018175",
+    "user20/session_7888368102",
+    "user21/session_6886360376",
+    "user23/session_0405064924",
+    "user29/session_8617964668",
+    "user35/session_6509784211",
+    "user9/session_3390119815"
+  ],
+  "val_users": [
+    "user12",
+    "user16",
+    "user20",
+    "user21",
+    "user23",
+    "user29",
+    "user35",
+    "user9"
+  ],
+  "A": {
+    "arm": "A: asinh (std~0.32), clip=True",
+    "model": "CustomUNet1D",
+    "clip_sample": true,
+    "curve": [
+      {
+        "step": 1,
+        "train": 1.0429363250732422,
+        "val": 0.6378266899373164
+      },
+      {
+        "step": 200,
+        "train": 0.10421806920188756,
+        "val": 0.09696375700914339
+      },
+      {
+        "step": 400,
+        "train": 0.08652726929634809,
+        "val": 0.08938998115935967
+      },
+      {
+        "step": 600,
+        "train": 0.0805446177534759,
+        "val": 0.08647540067827614
+      },
+      {
+        "step": 800,
+        "train": 0.08035594405606389,
+        "val": 0.08509005348090758
+      },
+      {
+        "step": 1000,
+        "train": 0.0775087270885706,
+        "val": 0.0834932532722066
+      },
+      {
+        "step": 1200,
+        "train": 0.07814545467495919,
+        "val": 0.08254362140982616
+      },
+      {
+        "step": 1400,
+        "train": 0.07646161455661059,
+        "val": 0.08198773654464427
+      },
+      {
+        "step": 1600,
+        "train": 0.076485556922853,
+        "val": 0.08147928177938077
+      },
+      {
+        "step": 1800,
+        "train": 0.07588573696091772,
+        "val": 0.08129439328219118
+      },
+      {
+        "step": 2000,
+        "train": 0.07598443815484643,
+        "val": 0.08038689675891622
+      }
+    ],
+    "final_train": 0.07598443815484643,
+    "final_val": 0.08038689675891622
+  },
+  "B": {
+    "arm": "B: standardized (unit std), clip=False",
+    "model": "CustomUNet1D",
+    "clip_sample": false,
+    "curve": [
+      {
+        "step": 1,
+        "train": 1.054988145828247,
+        "val": 0.7168267676263015
+      },
+      {
+        "step": 200,
+        "train": 0.21581890093321776,
+        "val": 0.20417023395557826
+      },
+      {
+        "step": 400,
+        "train": 0.18717337980866433,
+        "val": 0.1926862983660289
+      },
+      {
+        "step": 600,
+        "train": 0.1756650225818157,
+        "val": 0.18504485049618705
+      },
+      {
+        "step": 800,
+        "train": 0.17477626994252204,
+        "val": 0.1816079164350121
+      },
+      {
+        "step": 1000,
+        "train": 0.16898841984570026,
+        "val": 0.17914213841777846
+      },
+      {
+        "step": 1200,
+        "train": 0.16918637931346894,
+        "val": 0.177507552012065
+      },
+      {
+        "step": 1400,
+        "train": 0.16736577063798905,
+        "val": 0.17679892907692316
+      },
+      {
+        "step": 1600,
+        "train": 0.16656585052609443,
+        "val": 0.17535187100091487
+      },
+      {
+        "step": 1800,
+        "train": 0.1661982913315296,
+        "val": 0.174546884041764
+      },
+      {
+        "step": 2000,
+        "train": 0.16591993980109693,
+        "val": 0.1740140416688502
+      }
+    ],
+    "final_train": 0.16591993980109693,
+    "final_val": 0.1740140416688502
+  },
+  "winner": "A",
+  "why": "lower final val loss (-116.5% A->B)",
+  "correction": {
+    "verdict": "NULL \u2014 not a win for A; identical model quality",
+    "reason": "epsilon-MSE is not comparable across x0 scales: the Bayes-optimal MSE floor scales with x0 variance (~0.121 for sigma=0.32 arm A, ~0.276 for sigma=1.0 arm B). Both arms landed ~36.8% below their own floor, i.e. equal quality. The raw val-loss gap (0.080 vs 0.174) reflects the two floors, not a quality difference.",
+    "kept": "A",
+    "kept_because": "scale-invariant reasons only: (1) simpler \u2014 no standardization constant to store/invert at sample time; (2) A's asinh data is 100% within [-1,1], so DDIMScheduler(clip_sample=True) is a no-op rather than a distortion (B's ~+-3 range would be clipped).",
+    "supersedes": "the 'winner'/'why' fields above (retained for provenance)",
+    "retrained": false
+  }
+}

@@ -1,0 +1,19 @@
+# DMTG (attacker A3) — diffusion-based mouse trajectory generator
+# Isolated env: attacker/dmtg/.venv  (do NOT install into the TF 2.21 defender env)
+#
+# GPU target: RTX 5070 (Blackwell, sm_120). Requires torch built against CUDA 12.8+
+# for sm_120 kernels — older wheels fail at runtime with
+# "no kernel image is available for execution on the device".
+#
+# Reproduce with:
+#   python3 -m venv attacker/dmtg/.venv
+#   attacker/dmtg/.venv/bin/pip install -r attacker/dmtg/requirements.txt
+# For an exact byte-for-byte pin (all transitive deps), use requirements-lock.txt instead.
+
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+torch==2.11.0+cu128
+diffusers==0.39.0
+numpy==2.5.1
+pandas==3.0.3
+matplotlib==3.11.0

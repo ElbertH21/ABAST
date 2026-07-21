@@ -1,0 +1,23 @@
+{
+  "windmouse": {
+    "n_events": 874.95,
+    "path_len": 9393.226972004166,
+    "net_disp": 744.5154368090956,
+    "straightness": 0.082246408122045,
+    "duration": 146.58347016228763,
+    "velocity": 64.07060713754797
+  },
+  "sapiagent": {
+    "n_events": 1536.0,
+    "path_len": 7291.649345242865,
+    "net_disp": 794.1533751965707,
+    "straightness": 0.11069834525495999,
+    "duration": 256.59779670781563,
+    "velocity": 28.436292066758266
+  },
+  "expected_path_len": 9576.0,
+  "path_ratio_sa_over_wm": 0.7762667044004259,
+  "paired_ratio_mean": 0.8000796894318765,
+  "paired_ratio_median": 0.7404303502978582,
+  "n_paired": 60
+}

@@ -1,0 +1,74 @@
+{
+  "n_val": 1761,
+  "ddim_steps": 50,
+  "val_users": [
+    "user12",
+    "user16",
+    "user20",
+    "user21",
+    "user23",
+    "user29",
+    "user35",
+    "user9"
+  ],
+  "target_honoring_max_px": 0.0018374015344306827,
+  "genuine": {
+    "step_p50": 5.0,
+    "step_p90": 76.00657653808594,
+    "step_p99": 751.9834637451157,
+    "turn_angle_var": 0.9461411237716675,
+    "curvature_filtered_ge2px": 0.0672871544957161,
+    "path_efficiency": 0.21500176191329956
+  },
+  "sweep": {
+    "0.0": {
+      "step_p50": 7.28508448600769,
+      "step_p90": 59.94365768432619,
+      "step_p99": 663.58756652832,
+      "turn_angle_var": 0.978884220123291,
+      "curvature_filtered_ge2px": 0.0775841474533081,
+      "path_efficiency": 0.20631113648414612
+    },
+    "0.25": {
+      "step_p50": 6.889690399169922,
+      "step_p90": 55.75333366394055,
+      "step_p99": 647.9692657470692,
+      "turn_angle_var": 0.9579102396965027,
+      "curvature_filtered_ge2px": 0.07861336320638657,
+      "path_efficiency": 0.21680082380771637
+    },
+    "0.5": {
+      "step_p50": 6.725186109542847,
+      "step_p90": 51.87348403930664,
+      "step_p99": 583.0296142578107,
+      "turn_angle_var": 0.946377158164978,
+      "curvature_filtered_ge2px": 0.07995142787694931,
+      "path_efficiency": 0.21916109323501587
+    },
+    "0.75": {
+      "step_p50": 6.16901159286499,
+      "step_p90": 47.17111244201663,
+      "step_p99": 510.3343588256822,
+      "turn_angle_var": 0.9265472888946533,
+      "curvature_filtered_ge2px": 0.08219651877880096,
+      "path_efficiency": 0.2315407246351242
+    },
+    "1.0": {
+      "step_p50": 5.233644008636475,
+      "step_p90": 39.21036376953129,
+      "step_p99": 461.8022583007803,
+      "turn_angle_var": 0.8827442526817322,
+      "curvature_filtered_ge2px": 0.0828230232000351,
+      "path_efficiency": 0.26892170310020447
+    }
+  },
+  "realism_distance": {
+    "0.0": 0.1689936479979222,
+    "0.25": 0.1619763413173999,
+    "0.5": 0.18250590629248312,
+    "0.75": 0.2089574341786606,
+    "1.0": 0.24423641956880912
+  },
+  "recommended_eta": 0.25,
+  "selection_rule": "realism vs pooled genuine only; never bypass rate (target-blind, zero-query)"
+}
