@@ -1,8 +1,9 @@
-# ABAST — Behavioral Authentication Under Impersonation
+# ABAST — Behavioral Authentication Under Attack: AI Mouse Bots, Human Impostors, and User-Specific Vulnerability
 
-Do generated mouse trajectories bypass per-user mouse-dynamics authentication, and
-does attacker realism predict success? (Short answer: realism does not predict
-bypass.)
+## Research Questions
+1. How does attack success change as mouse bots become more sophisticated, and how do they compare with real human impostors?
+2. Are some users more vulnerable to behavioral imitation than others, and does the strongest attacker depend on the target user?
+3. Can additional defense mechanisms improve robustness against synthetic attacks without significantly reducing legitimate-user acceptance?
 
 ## Start here
 - **Canonical run:** `defender/notebooks/Week8_ABAST_E_M.ipynb`, the leakage-free
