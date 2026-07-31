@@ -1,0 +1,89 @@
+ABAST figure generation
+input : ./results/leakage_free
+output: ./results/figures/poster
+threshold policy: calibration_FAR<=0.10
+panel 3 aggregation: case
+
+========================================================================
+FIGURE 1 - bot realism strip
+========================================================================
+  A0 human impostor baseline (tier-equal-weighted): 9.40%
+  WindMouse   bypass 11.15%   ABOVE baseline
+  SapiAgent   bypass 11.26%   ABOVE baseline
+  DMTG        bypass 4.16%   BELOW baseline
+  A0 by tier: {'T0': 4.98, 'T1': 8.18, 'T2': 13.41, 'T3': 11.04}
+  curvature variant used: filtered (steps >= 2px)
+  WindMouse   distance 0.5801   (velocity 0.435  pause_rate 0.010  curvature 1.295)
+  SapiAgent   distance 0.8316   (velocity 0.947  pause_rate 0.011  curvature 1.537)
+  DMTG        distance 0.0649   (velocity 0.076  pause_rate 0.011  curvature 0.108)
+  [cross-check] distances with RAW curvature: WindMouse 0.6156, SapiAgent 0.7044, DMTG 0.0988
+  MISSING: trajectory_samples.csv  (columns: source, step, x, y  (needed only for the trajectory strip))
+  wrote fig1c_realism_distance.png/svg
+  wrote fig1b_realism_slopegraph.png/svg
+  wrote fig1_bypass_vs_baseline.png/svg
+
+========================================================================
+FIGURE 2 - per-user bypass dot plot
+========================================================================
+  tier-equal-weighted, sorted by worst case
+  poster label -> balabit id (FOOTNOTE THIS ON THE POSTER)
+    User 1  = user21   WindMouse 0.0%  SapiAgent 44.3%  DMTG 2.5%
+    User 2  = user15   WindMouse 39.2%  SapiAgent 0.1%  DMTG 13.6%
+    User 3  = user29   WindMouse 9.2%  SapiAgent 28.2%  DMTG 5.1%
+    User 4  = user23   WindMouse 28.1%  SapiAgent 1.7%  DMTG 1.5%
+    User 5  = user9    WindMouse 21.2%  SapiAgent 0.1%  DMTG 0.0%
+    User 6  = user7    WindMouse 4.9%  SapiAgent 14.6%  DMTG 2.3%
+    User 7  = user35   WindMouse 0.1%  SapiAgent 10.7%  DMTG 0.0%
+    User 8  = user20   WindMouse 5.4%  SapiAgent 5.2%  DMTG 7.1%
+    User 9  = user16   WindMouse 2.7%  SapiAgent 5.9%  DMTG 5.8%
+    User 10 = user12   WindMouse 0.6%  SapiAgent 1.8%  DMTG 3.6%
+  wrote fig2_per_user_bypass.png/svg
+
+========================================================================
+FIGURE 3 - threshold floor, two-group split
+========================================================================
+  cases total: 300   collapsed (<0.05): 6
+  collapsed by tier: {'T2': 5, 'T3': 1}
+  294 normal cases
+    genuine accepted : 56.99% -> 56.99%
+    mean bypass      : 10.59% -> 10.59%
+  6 collapsed-threshold cases
+    genuine accepted : 97.33% -> 96.58%
+    mean bypass      : 21.11% -> 11.94%
+  [cross-check] normal group, case agg: TAR 56.99% bypass 10.59%
+  [cross-check] normal group, tier agg: TAR 52.91% bypass 8.66%
+  wrote fig3_threshold_floor.png/svg
+
+========================================================================
+FIGURE 4 - layered defense tradeoff
+========================================================================
+  gatekeeper(s): ['T2_RandomForest']  (single model, session level)
+  Genuine user         gate 53.68%  ->  after anomaly 22.58%
+  Human impostor       gate 3.63%  ->  after anomaly 1.88%
+  Mouse bot            gate 0.56%  ->  after anomaly 0.00%
+  of gate-accepted genuine sessions, flagged: 58.43%
+  wrote fig4_layered_defense.png/svg
+
+========================================================================
+FIGURE 5 - bypass by defender tier
+========================================================================
+  session bypass % by tier:
+    T0  WindMouse 0.00  SapiAgent 0.00  DMTG 0.00   |  A0 human 4.98
+    T1  WindMouse 9.71  SapiAgent 12.79  DMTG 7.71   |  A0 human 8.18
+    T2  WindMouse 17.71  SapiAgent 18.42  DMTG 6.25   |  A0 human 13.41
+    T3  WindMouse 17.17  SapiAgent 13.83  DMTG 2.67   |  A0 human 11.04
+  wrote fig5_bypass_by_tier.png/svg
+
+========================================================================
+USER LABEL MAPPING (must appear as a poster footnote)
+========================================================================
+  User 1 = user21
+  User 2 = user15
+  User 3 = user29
+  User 4 = user23
+  User 5 = user9
+  User 6 = user7
+  User 7 = user35
+  User 8 = user20
+  User 9 = user16
+  User 10 = user12

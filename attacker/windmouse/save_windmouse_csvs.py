@@ -11,8 +11,8 @@ import os, re, glob
 import numpy as np
 import pandas as pd
 
-SRC = "/home/junio/reu-sapiagent/attacker/realism_step8.py"
-OUT = "/home/junio/reu-sapiagent/a2/handoff/windmouse_sessions"
+SRC = os.environ.get("WINDMOUSE_SRC", "./attacker/sapiagent/realism_step8.py")
+OUT = os.environ.get("WINDMOUSE_OUT", "./a2/handoff/windmouse_sessions")
 WM_COLS = ["record timestamp", "x", "y", "user", "session", "label"]
 
 # ---- 1. reuse the exact windmouse generation ----------------------------

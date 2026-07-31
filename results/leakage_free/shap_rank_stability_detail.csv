@@ -1,0 +1,3 @@
+user,rank1_feature,rank1_stable,rank2_feature,rank2_stable,rank3_feature,rank3_stable
+user15,curvature_std,True,,False,,False
+user21,curvature_p25,True,,False,,False

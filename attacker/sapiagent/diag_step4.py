@@ -2,7 +2,7 @@
 optimization/scale problem? Compare baselines + raw vs standardized training."""
 import os, sys
 import numpy as np
-sys.path.insert(0, "/home/junio/reu-sapiagent/sapiagent")
+sys.path.insert(0, os.environ.get("SAPIAGENT_ROOT", "./sapiagent"))
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 import settings as stt

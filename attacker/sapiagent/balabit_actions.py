@@ -16,7 +16,7 @@ import glob
 import numpy as np
 import pandas as pd
 
-BALABIT_ROOT = "/home/junio/reu-sapiagent/Mouse-Dynamics-Challenge"
+BALABIT_ROOT = os.environ.get("BALABIT_ROOT", "./data/Mouse-Dynamics-Challenge")
 WINDOW = 128  # deltas per action (settings.FEATURES)
 T_COL = "record timestamp"
 

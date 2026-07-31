@@ -9,7 +9,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-sys.path.insert(0, "/home/junio/reu-sapiagent/sapiagent")  # for settings + models
+sys.path.insert(0, os.environ.get("SAPIAGENT_ROOT", "./sapiagent"))  # for settings + models
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 
