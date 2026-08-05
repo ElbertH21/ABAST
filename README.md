@@ -1,10 +1,19 @@
-# Behavioral Authentication Under Attack
+# AI Mouse Bots, Human Impostors, and User-Specific Vulnerability
 
-## Authors
-- Elbert Henriquez (@ElbertH21)
-- Mahnoor Shahid (@mahnoorshahidx)
+## Project Team
 
-**AI Mouse Bots, Human Impostors, and User-Specific Vulnerability**
+**Researchers**
+- Mahnoor Shahid (@mahnoorshahidx)  
+- Elbert Henriquez (@ElbertH21)  
+
+**Mentors**
+- Rui Duan
+- Yugyung Lee
+
+**Affiliation**
+- University of Missouri–Kansas City (UMKC)
+
+## Overview
 
 Behavioral authentication watches *how* you move a mouse and continuously checks that you are still you — so a stolen password isn't the end of the story. It was designed to catch human impostors. Bots are a newer question.
 
